@@ -8,7 +8,6 @@ namespace TecsDotNet
     {
         #region Fields
             
-        public static uint ID_COUNTER = 0;
         private Dictionary<Type, Component> components;
 
         #endregion

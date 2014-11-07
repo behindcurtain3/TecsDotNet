@@ -2,6 +2,31 @@
 
 namespace TecsDotNet.Managers
 {
+    internal class IdentifierPool
+    {
+        private uint NextAvailableID;
+        private Stack<uint> IDs;
+
+        public IdentifierPool(uint startID = 0)
+        {
+            NextAvailableID = startID;
+            IDs = new Stack<uint>();
+        }
+
+        public uint CheckOut()
+        {
+            if (IDs.Count > 0)
+                return IDs.Pop();
+
+            return NextAvailableID++;
+        }
+
+        public void CheckIn(uint id)
+        {
+            IDs.Push(id);
+        }
+    }
+
     public class EntityManager : List<Entity>, IManager
     {
         #region Events
@@ -11,7 +36,13 @@ namespace TecsDotNet.Managers
         public event EntityEventHandler EntityRemoved;
 
         #endregion
-        
+
+        #region Fields
+
+        private IdentifierPool idPool;
+
+        #endregion
+
         #region Properties
 
         public World World { get; private set; }
@@ -23,6 +54,7 @@ namespace TecsDotNet.Managers
         public EntityManager(World world)
         {
             World = world;
+            idPool = new IdentifierPool();
         }
 
         public new void Add(Entity e)
@@ -31,7 +63,7 @@ namespace TecsDotNet.Managers
                 return;
 
             // set the entity id
-            e.ID = ++Entity.ID_COUNTER;
+            e.ID = idPool.CheckOut();
 
             base.Add(e);
 
@@ -43,6 +75,8 @@ namespace TecsDotNet.Managers
         {
             if (base.Remove(e))
             {
+                idPool.CheckIn(e.ID);
+
                 if (EntityRemoved != null)
                     EntityRemoved.Invoke(e, World);
 
