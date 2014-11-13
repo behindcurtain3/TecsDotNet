@@ -30,13 +30,11 @@ namespace TecsDotNet.Managers
 
     public class EntityEventArgs : EventArgs
     {
-        public Entity Entity { get; set; }
-        public World World { get; set; }
+        public Entity Entity { get; private set; }
 
-        public EntityEventArgs(Entity e, World w)
+        public EntityEventArgs(Entity e)
         {
             Entity = e;
-            World = w;
         }
     }
 
@@ -81,7 +79,7 @@ namespace TecsDotNet.Managers
             base.Add(e);
 
             if (EntityAdded != null)
-                EntityAdded.Invoke(this, new EntityEventArgs(e, World));
+                EntityAdded.Invoke(this, new EntityEventArgs(e));
         }
 
         public new bool Remove(Entity e)
@@ -91,7 +89,7 @@ namespace TecsDotNet.Managers
                 idPool.CheckIn(e.ID);
 
                 if (EntityRemoved != null)
-                    EntityRemoved.Invoke(this, new EntityEventArgs(e, World));
+                    EntityRemoved.Invoke(this, new EntityEventArgs(e));
 
                 return true;
             }

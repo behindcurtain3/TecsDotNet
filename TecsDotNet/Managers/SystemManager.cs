@@ -5,13 +5,11 @@ namespace TecsDotNet.Managers
 {
     public class SystemEventArgs : EventArgs
     {
-        public System System { get; set; }
-        public World World { get; set; }
+        public System System { get; private set; }
 
-        public SystemEventArgs(System s, World w)
+        public SystemEventArgs(System s)
         {
             System = s;
-            World = w;
         }
     }
 
@@ -77,7 +75,7 @@ namespace TecsDotNet.Managers
                     s.Init();
 
                     if (SystemAdded != null)
-                        SystemAdded.Invoke(this, new SystemEventArgs(s, World));
+                        SystemAdded.Invoke(this, new SystemEventArgs(s));
                 }
 
                 toAdd.Clear();
@@ -92,7 +90,7 @@ namespace TecsDotNet.Managers
                         s.Shutdown();
 
                         if (SystemRemoved != null)
-                            SystemRemoved.Invoke(this, new SystemEventArgs(s, World));
+                            SystemRemoved.Invoke(this, new SystemEventArgs(s));
                     }
                 }
 
