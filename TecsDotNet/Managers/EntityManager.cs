@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace TecsDotNet.Managers
 {
@@ -27,11 +28,23 @@ namespace TecsDotNet.Managers
         }
     }
 
+    public class EntityEventArgs : EventArgs
+    {
+        public Entity Entity { get; set; }
+        public World World { get; set; }
+
+        public EntityEventArgs(Entity e, World w)
+        {
+            Entity = e;
+            World = w;
+        }
+    }
+
     public class EntityManager : List<Entity>, IManager
     {
         #region Events
 
-        public delegate void EntityEventHandler(Entity e, World world);
+        public delegate void EntityEventHandler(object sender, EntityEventArgs e);
         public event EntityEventHandler EntityAdded;
         public event EntityEventHandler EntityRemoved;
 
@@ -68,7 +81,7 @@ namespace TecsDotNet.Managers
             base.Add(e);
 
             if (EntityAdded != null)
-                EntityAdded.Invoke(e, World);
+                EntityAdded.Invoke(this, new EntityEventArgs(e, World));
         }
 
         public new bool Remove(Entity e)
@@ -78,7 +91,7 @@ namespace TecsDotNet.Managers
                 idPool.CheckIn(e.ID);
 
                 if (EntityRemoved != null)
-                    EntityRemoved.Invoke(e, World);
+                    EntityRemoved.Invoke(this, new EntityEventArgs(e, World));
 
                 return true;
             }

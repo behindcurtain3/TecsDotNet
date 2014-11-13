@@ -1,12 +1,25 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace TecsDotNet.Managers
 {
+    public class SystemEventArgs : EventArgs
+    {
+        public System System { get; set; }
+        public World World { get; set; }
+
+        public SystemEventArgs(System s, World w)
+        {
+            System = s;
+            World = w;
+        }
+    }
+
     public class SystemManager : List<System>, IManager
     {
         #region Events
 
-        public delegate void SystemEventHandler(System s, World world);
+        public delegate void SystemEventHandler(object sender, SystemEventArgs e);
         public event SystemEventHandler SystemAdded;
         public event SystemEventHandler SystemRemoved;
 
@@ -64,7 +77,7 @@ namespace TecsDotNet.Managers
                     s.Init();
 
                     if (SystemAdded != null)
-                        SystemAdded.Invoke(s, World);
+                        SystemAdded.Invoke(this, new SystemEventArgs(s, World));
                 }
 
                 toAdd.Clear();
@@ -79,7 +92,7 @@ namespace TecsDotNet.Managers
                         s.Shutdown();
 
                         if (SystemRemoved != null)
-                            SystemRemoved.Invoke(s, World);
+                            SystemRemoved.Invoke(this, new SystemEventArgs(s, World));
                     }
                 }
 
